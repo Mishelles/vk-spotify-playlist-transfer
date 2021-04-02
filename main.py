@@ -44,13 +44,12 @@ while i < total_tracks - page_size:
     print('Current page tracks: ' + str(i))
     time.sleep(1)
 
-
-with open('jsondump.json', 'w', encoding='utf-8') as s:
+with open('tracksFromVk.json', 'w', encoding='utf-8') as s:
     s.write(json.dumps(all_tracks, indent=2, ensure_ascii=False))
 
 sp = spotipy.Spotify(config.get('sp_token'))
 
-with open('jsondump.json', 'r') as s:
+with open('tracksFromVk.json', 'r') as s:
     track_list_vk = json.load(s)
 
 track_list_spotify = []
@@ -65,7 +64,7 @@ for song in track_list_vk[:10]:
     except IndexError:
         print('No tracks found for title: ' + title)
 
-with open('spotifyId.json', 'w', encoding='utf-8') as s:
+with open('spotifyIds.json', 'w', encoding='utf-8') as s:
     s.write(json.dumps(track_list_spotify, indent=2, ensure_ascii=False))
 
 # 200 per page

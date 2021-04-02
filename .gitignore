@@ -1,8 +1,7 @@
 creds.yaml
 /.idea
-jsondump.json
-spotifyId.json
-test.py
+tracksFromVk.json
+spotifyIds.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
