@@ -4,29 +4,27 @@ import requests
 import json
 import time
 import spotipy
+import yaml
 
-login = '' # your vk login, e-mail or phone number
-password = '' # your vk password
-vk_token = ''
-version = ''
-user_agent = ''
+with open ('creds.yaml', 'r') as c:
+    config = yaml.safe_load(c)
 
 # print(get_vk_official_token(login, password))
 
 sess = requests.session()
-sess.headers.update({'User-Agent': user_agent})
+sess.headers.update({'User-Agent': config.get('user_agent')})
 
 page_size = 100
 total_tracks = sess.get(
     "https://api.vk.com/method/audio.get",
-    params=[('access_token', vk_token),
-            ('v', version)]
+    params=[('access_token', config.get('vk_token')),
+            ('v', config.get('version'))]
 ).json()['response']['count']
 
 print(sess.get(
     "https://api.vk.com/method/audio.get",
-    params=[('access_token', token),
-            ('v', version),
+    params=[('access_token', config.get('token')),
+            ('v', config.get('version')),
             ('offset', 3900),
             ('count', 100)]
 ).json()['response']['items'])
@@ -36,8 +34,8 @@ all_tracks = []
 while i < total_tracks - page_size:
     current_page_tracks = sess.get(
         "https://api.vk.com/method/audio.get",
-        params=[('access_token', vk_token),
-                ('v', version),
+        params=[('access_token', config.get('vk_token')),
+                ('v', config.get('version')),
                 ('count', page_size),
                 ('offset', i)]
     ).json()['response']['items']
@@ -50,9 +48,7 @@ while i < total_tracks - page_size:
 with open('jsondump.json', 'w', encoding='utf-8') as s:
     s.write(json.dumps(all_tracks, indent=2, ensure_ascii=False))
 
-sp_token = ''
-
-sp = spotipy.Spotify(sp_token)
+sp = spotipy.Spotify(config.get('sp_token'))
 
 with open('jsondump.json', 'r') as s:
     track_list_vk = json.load(s)
