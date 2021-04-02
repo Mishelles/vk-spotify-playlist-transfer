@@ -90,7 +90,7 @@ for song in track_list_vk[:10]:
     }).json()
 
     try:
-        track_id = response['results']['tracks']['hits'][0]['uri']
+        track_id = response['results']['tracks']['hits'][0]['uri'].split(':')[2]
         track_returned_name = response['results']['tracks']['hits'][0]['name']
         track_list_spotify.append({'name': track_returned_name, 'id': track_id})
     except IndexError:
