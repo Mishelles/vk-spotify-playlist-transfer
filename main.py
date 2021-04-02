@@ -12,10 +12,37 @@ import cyrtranslit
 
 # print(cyrtranslit.to_latin("Ночные Снайперы", "ru"))
 
-with open ('creds.yaml', 'r') as c:
+with open('creds.yaml', 'r') as c:
     config = yaml.safe_load(c)
 
+
 # print(get_vk_official_token(login, password))
+
+
+def add_tracks_to_playlist(tracks, id):
+    tracks_str = ','.join(tracks)
+    res = requests.post(
+        'https://api.spotify.com/v1/playlists/{}/tracks?uris={}'.format(id, tracks_str),
+        headers={
+            "Authorization": 'Bearer {}'.format(config.get('sp_access_token'))
+        }
+    ).json()
+    print(res)
+
+
+def create_playlist_in_spotify():
+    playlist_id = requests.post(
+        'https://api.spotify.com/v1/users/{}/playlists'.format(config.get('sp_user_id')),
+        json={
+            "name": "New Playlist",
+            "description": "New playlist description",
+            "public": 'false'
+        },
+        headers={
+            "Authorization": 'Bearer {}'.format(config.get('sp_access_token'))
+        }
+    ).json()['id']
+    return playlist_id
 
 
 def perform_request_to_spotify(url, query):
@@ -26,7 +53,7 @@ def perform_request_to_spotify(url, query):
 
     if results.status_code == 401:
         config['sp_access_token'] = revoke_token(config.get('sp_refresh_token'))
-        return perform_request_to_spotify(query)
+        return perform_request_to_spotify(url, query)
     return results
 
 
@@ -80,7 +107,7 @@ track_list_spotify = []
 
 BASIC_QUERY_SP = 'https://spclient.wg.spotify.com/searchview/km/v4/search/{}'
 
-for song in track_list_vk[:10]:
+for song in track_list_vk[:30]:
     title = song['title']
     artist = song['artist']
     query = BASIC_QUERY_SP.format(artist + " " + title)
@@ -90,7 +117,7 @@ for song in track_list_vk[:10]:
     }).json()
 
     try:
-        track_id = response['results']['tracks']['hits'][0]['uri'].split(':')[2]
+        track_id = response['results']['tracks']['hits'][0]['uri']
         track_returned_name = response['results']['tracks']['hits'][0]['name']
         track_list_spotify.append({'name': track_returned_name, 'id': track_id})
     except IndexError:
@@ -98,8 +125,11 @@ for song in track_list_vk[:10]:
     finally:
         time.sleep(1)
 
-
 with open('spotifyIds.json', 'w', encoding='utf-8') as s:
     s.write(json.dumps(track_list_spotify, indent=2, ensure_ascii=False))
+
+sp_playlist_id = create_playlist_in_spotify()
+
+add_tracks_to_playlist([i['id'] for i in track_list_spotify[:10]], sp_playlist_id)
 
 # 200 per page
