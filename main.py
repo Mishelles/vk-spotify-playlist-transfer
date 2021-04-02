@@ -5,12 +5,15 @@ import json
 import time
 import yaml
 import logging
-import cyrtranslit
 
 # logging.basicConfig(level=logging.DEBUG)
 
-
-# print(cyrtranslit.to_latin("Ночные Снайперы", "ru"))
+'''
+    TODO:
+        1. Add regexp to clean track's name ('/' - is not valid)
+        2. Add proper mechanism for taking tokens
+        
+'''
 
 with open('creds.yaml', 'r') as c:
     config = yaml.safe_load(c)
@@ -27,7 +30,6 @@ def add_tracks_to_playlist(tracks, id):
             "Authorization": 'Bearer {}'.format(config.get('sp_access_token'))
         }
     ).json()
-    print(res)
 
 
 def create_playlist_in_spotify():
@@ -107,29 +109,44 @@ track_list_spotify = []
 
 BASIC_QUERY_SP = 'https://spclient.wg.spotify.com/searchview/km/v4/search/{}'
 
-for song in track_list_vk[:30]:
-    title = song['title']
-    artist = song['artist']
-    query = BASIC_QUERY_SP.format(artist + " " + title)
-    response = perform_request_to_spotify(query, {
-        'catalogue': '',
-        'country': 'RU'
-    }).json()
+# for song in track_list_vk:
+#     title = song['title']
+#     artist = song['artist']
+#     query = BASIC_QUERY_SP.format(artist + " " + title)
+#     response = perform_request_to_spotify(query, {
+#         'catalogue': '',
+#         'country': 'RU'
+#     })
+#
+#     if response.status_code == 404:
+#         continue
+#     response = response.json()
+#
+#     try:
+#         track_id = response['results']['tracks']['hits'][0]['uri']
+#         track_returned_name = response['results']['tracks']['hits'][0]['name']
+#         track_list_spotify.append({'name': track_returned_name, 'id': track_id})
+#     except IndexError:
+#         print('title ' + title + ' artist ' + artist + ' not found! ')
+#     except KeyError:
+#         print('title ' + title + ' artist ' + artist + ' not found! (Key error)')
+#     finally:
+#         time.sleep(0.2)
+#
+# with open('spotifyIds.json', 'w', encoding='utf-8') as s:
+#     s.write(json.dumps(track_list_spotify, indent=2, ensure_ascii=False))
 
-    try:
-        track_id = response['results']['tracks']['hits'][0]['uri']
-        track_returned_name = response['results']['tracks']['hits'][0]['name']
-        track_list_spotify.append({'name': track_returned_name, 'id': track_id})
-    except IndexError:
-        print('title ' + title + ' artist ' + artist + ' not found! ')
-    finally:
-        time.sleep(1)
-
-with open('spotifyIds.json', 'w', encoding='utf-8') as s:
-    s.write(json.dumps(track_list_spotify, indent=2, ensure_ascii=False))
+with open('spotifyIds.json', 'r') as s:
+    track_list_spotify = json.load(s)
 
 sp_playlist_id = create_playlist_in_spotify()
 
-add_tracks_to_playlist([i['id'] for i in track_list_spotify[:10]], sp_playlist_id)
-
-# 200 per page
+ids_to_insert = []
+i = 0
+for t in track_list_spotify:
+    i += 1
+    ids_to_insert.append(t['id'])
+    if i == 10:
+        i = 0
+        add_tracks_to_playlist(ids_to_insert, sp_playlist_id)
+        ids_to_insert = []
