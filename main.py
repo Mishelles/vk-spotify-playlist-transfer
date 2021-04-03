@@ -11,6 +11,8 @@ import logging
 '''
     TODO:
         1. Add regexp to clean track's name ('/' - is not valid)
+            1.1 everything enclosed in brackets - \([^)]*\)\W
+            1.2 everything non-word [^\w\s]
         2. Add proper mechanism for taking tokens
         
 '''
