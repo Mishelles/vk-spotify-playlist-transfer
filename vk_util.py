@@ -24,6 +24,7 @@ total_tracks = sess.get(
 
 i = 0
 all_tracks = []
+
 while i < total_tracks - page_size:
     current_page_tracks = sess.get(
         "https://api.vk.com/method/audio.get",
@@ -35,6 +36,17 @@ while i < total_tracks - page_size:
     all_tracks += [{'artist': l['artist'], 'title': l['title']} for l in current_page_tracks]
     i += page_size
     time.sleep(1)
+
+mod = total_tracks % page_size
+current_page_tracks = sess.get(
+        "https://api.vk.com/method/audio.get",
+        params=[('access_token', config.get('vk_token')),
+                ('v', config.get('vk_version')),
+                ('count', mod),
+                ('offset', i)]
+    ).json()['response']['items']
+all_tracks += [{'artist': l['artist'], 'title': l['title']} for l in current_page_tracks]
+time.sleep(1)
 
 with open('tracksFromVk.json', 'w', encoding='utf-8') as s:
     s.write(json.dumps(all_tracks, indent=2, ensure_ascii=False))
