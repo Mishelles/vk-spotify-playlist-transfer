@@ -29,7 +29,7 @@ class SpotifySearchException(Exception):
     pass
 
 
-class SpotifyRootTokenException(Exception):
+class SpotifyAuthException(Exception):
     pass
 
 
@@ -49,7 +49,7 @@ def revoke_root_token():
 
 def search_track_on_spotify(query, level=0):
     if level > 2:
-        raise SpotifyRootTokenException
+        raise SpotifyAuthException
     response = requests.get(
         'https://spclient.wg.spotify.com/searchview/km/v4/search/{}'.format(query),
         params={
@@ -81,18 +81,25 @@ def search_track_on_spotify(query, level=0):
         return track_id, track_returned_name
 
 
-def add_tracks_to_playlist(tracks, id):
+def add_tracks_to_playlist(tracks, id, level=0):
+    if level > 2:
+        raise SpotifyAuthException
     tracks_str = ','.join(tracks)
     res = requests.post(
         'https://api.spotify.com/v1/playlists/{}/tracks?uris={}'.format(id, tracks_str),
         headers={
             "Authorization": 'Bearer {}'.format(config.get('sp_access_token'))
         }
-    ).json()
+    )
+    if res.status_code == 401:
+        revoke_user_token()
+        add_tracks_to_playlist(tracks, id, level + 1)
 
 
-def create_playlist_in_spotify():
-    playlist_id = requests.post(
+def create_playlist_in_spotify(level=0):
+    if level > 2:
+        raise SpotifyAuthException
+    result = requests.post(
         'https://api.spotify.com/v1/users/{}/playlists'.format(config.get('sp_user_id')),
         json={
             "name": "New Playlist",
@@ -102,15 +109,23 @@ def create_playlist_in_spotify():
         headers={
             "Authorization": 'Bearer {}'.format(config.get('sp_access_token'))
         }
-    ).json()['id']
+    )
+    if result.status_code == 401:
+        revoke_user_token()
+        create_playlist_in_spotify(level + 1)
+    try:
+        playlist_id = result.json()['id']
+    except Exception:
+        raise SpotifySearchException
+
     return playlist_id
 
 
-def revoke_user_token(refresh_token: str):
+def revoke_user_token():
     response = requests.post('https://accounts.spotify.com/api/token',
-                             data={'refresh_token': refresh_token, 'grant_type': 'refresh_token'},
+                             data={'refresh_token': config.get("sp_refresh_token"), 'grant_type': 'refresh_token'},
                              headers={"Authorization": 'Basic {}'.format(config.get('sp_basic_auth'))}).json()
-    return response['access_token']
+    config['sp_access_token'] = response['access_token']
 
 
 # sess = requests.session()
