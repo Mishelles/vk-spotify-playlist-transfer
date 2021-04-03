@@ -80,7 +80,7 @@ def add_tracks_to_playlist(tracks, id, level=0):
     )
     if res.status_code == 401:
         revoke_user_token()
-        add_tracks_to_playlist(tracks, id, level + 1)
+        return add_tracks_to_playlist(tracks, id, level + 1)
 
 
 def create_playlist_in_spotify(level=0):
@@ -99,7 +99,7 @@ def create_playlist_in_spotify(level=0):
     )
     if result.status_code == 401:
         revoke_user_token()
-        create_playlist_in_spotify(level + 1)
+        return create_playlist_in_spotify(level + 1)
     try:
         playlist_id = result.json()['id']
     except Exception:
