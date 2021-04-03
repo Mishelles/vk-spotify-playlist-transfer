@@ -5,6 +5,7 @@ import json
 import time
 import yaml
 import logging
+from .get_root_access_token_for_sp import get_token
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -23,11 +24,61 @@ import logging
         
 '''
 
+
+class SpotifySearchException(Exception):
+    pass
+
+
+class SpotifyRootTokenException(Exception):
+    pass
+
+
 with open('creds.yaml', 'r') as c:
     config = yaml.safe_load(c)
 
 
 # print(get_vk_official_token(login, password))
+
+def tokenize(t, a):
+    return t + " " + a
+
+
+def revoke_root_token():
+    config['sp_root_token'] = get_token()
+
+
+def search_track_on_spotify(query, level=0):
+    if level > 2:
+        raise SpotifyRootTokenException
+    response = requests.get(
+        'https://spclient.wg.spotify.com/searchview/km/v4/search/{}'.format(query),
+        params={
+            'catalogue': '',
+            'country': 'RU'
+        },
+        headers={
+            'Authorization': "Bearer {}".format(config.get('sp_root_token')),
+            'Host': "spclient.wg.spotify.com"
+        }
+    )
+    if response.status_code == 401:
+        revoke_root_token()
+        return search_track_on_spotify(query, level + 1)
+    elif response.status_code == 404:
+        raise SpotifySearchException
+    else:
+        try:
+            results = response.json()
+        except Exception:
+            raise SpotifySearchException
+
+        try:
+            track_id = results['results']['tracks']['hits'][0]['uri']
+            track_returned_name = results['results']['tracks']['hits'][0]['name']
+        except Exception:
+            raise SpotifySearchException
+
+        return track_id, track_returned_name
 
 
 def add_tracks_to_playlist(tracks, id):
@@ -55,19 +106,7 @@ def create_playlist_in_spotify():
     return playlist_id
 
 
-def perform_request_to_spotify(url, query):
-    results = requests.get(url, params=query, headers={
-        'Authorization': "Bearer {}".format(config.get('sp_access_token')),
-        'Host': "spclient.wg.spotify.com"
-    })
-
-    if results.status_code == 401:
-        config['sp_access_token'] = revoke_token(config.get('sp_refresh_token'))
-        return perform_request_to_spotify(url, query)
-    return results
-
-
-def revoke_token(refresh_token: str):
+def revoke_user_token(refresh_token: str):
     response = requests.post('https://accounts.spotify.com/api/token',
                              data={'refresh_token': refresh_token, 'grant_type': 'refresh_token'},
                              headers={"Authorization": 'Basic {}'.format(config.get('sp_basic_auth'))}).json()
@@ -115,34 +154,29 @@ with open('tracksFromVk.json', 'r') as s:
 
 track_list_spotify = []
 
-BASIC_QUERY_SP = 'https://spclient.wg.spotify.com/searchview/km/v4/search/{}'
+for song in track_list_vk:
+    title = song['title']
+    artist = song['artist']
+    clear_query_string = tokenize(title, artist)
+    response = search_track_on_spotify(clear_query_string)
 
-# for song in track_list_vk:
-#     title = song['title']
-#     artist = song['artist']
-#     query = BASIC_QUERY_SP.format(artist + " " + title)
-#     response = perform_request_to_spotify(query, {
-#         'catalogue': '',
-#         'country': 'RU'
-#     })
-#
-#     if response.status_code == 404:
-#         continue
-#     response = response.json()
-#
-#     try:
-#         track_id = response['results']['tracks']['hits'][0]['uri']
-#         track_returned_name = response['results']['tracks']['hits'][0]['name']
-#         track_list_spotify.append({'name': track_returned_name, 'id': track_id})
-#     except IndexError:
-#         print('title ' + title + ' artist ' + artist + ' not found! ')
-#     except KeyError:
-#         print('title ' + title + ' artist ' + artist + ' not found! (Key error)')
-#     finally:
-#         time.sleep(0.2)
-#
-# with open('spotifyIds.json', 'w', encoding='utf-8') as s:
-#     s.write(json.dumps(track_list_spotify, indent=2, ensure_ascii=False))
+    if response.status_code == 404:
+        continue
+    response = response.json()
+
+    try:
+        track_id = response['results']['tracks']['hits'][0]['uri']
+        track_returned_name = response['results']['tracks']['hits'][0]['name']
+        track_list_spotify.append({'name': track_returned_name, 'id': track_id})
+    except IndexError:
+        print('title ' + title + ' artist ' + artist + ' not found! ')
+    except KeyError:
+        print('title ' + title + ' artist ' + artist + ' not found! (Key error)')
+    finally:
+        time.sleep(0.2)
+
+with open('spotifyIds.json', 'w', encoding='utf-8') as s:
+    s.write(json.dumps(track_list_spotify, indent=2, ensure_ascii=False))
 
 with open('spotifyIds.json', 'r') as s:
     track_list_spotify = json.load(s)
