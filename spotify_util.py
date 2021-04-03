@@ -2,22 +2,32 @@ import requests
 import json
 import time
 import yaml
+import re
+from nltk.tokenize import RegexpTokenizer
 from get_root_access_token_for_sp import get_token
 
 with open('creds.yaml', 'r') as c:
     config = yaml.safe_load(c)
 
 
-class SpotifySearchException(Exception):
+class SpotifyException(Exception):
+    def __str__(self):
+        return self.__class__.__name__
+
+
+class SpotifySearchException(SpotifyException):
     pass
 
 
-class SpotifyAuthException(Exception):
+class SpotifyAuthException(SpotifyException):
     pass
 
 
-def tokenize(t, a):
-    return t + " " + a
+def clean(t, a):
+    without_brackets = re.sub(r'\([^)]*\)\W', '', t + " " + a)
+    without_feat = re.sub(r'(?i)(\s*)f(?:ea)?t(?:(?:\.?|\s)|uring)(?=\s)', '', without_brackets)
+    tokenizer = RegexpTokenizer(r'\w+')
+    return " ".join(tokenizer.tokenize(without_feat))
 
 
 def revoke_root_token():
@@ -79,7 +89,7 @@ def create_playlist_in_spotify(level=0):
     result = requests.post(
         'https://api.spotify.com/v1/users/{}/playlists'.format(config.get('sp_user_id')),
         json={
-            "name": "New Playlist",
+            "name": "Test playlist",
             "description": "New playlist description",
             "public": 'false'
         },
@@ -110,26 +120,16 @@ with open('tracksFromVk.json', 'r') as s:
 
 track_list_spotify = []
 
+
 for song in track_list_vk:
     title = song['title']
     artist = song['artist']
-    clear_query_string = tokenize(title, artist)
-    response = search_track_on_spotify(clear_query_string)
-
-    if response.status_code == 404:
-        continue
-    response = response.json()
-
+    clear_query_string = clean(title, artist)
     try:
-        track_id = response['results']['tracks']['hits'][0]['uri']
-        track_returned_name = response['results']['tracks']['hits'][0]['name']
-        track_list_spotify.append({'name': track_returned_name, 'id': track_id})
-    except IndexError:
-        print('title ' + title + ' artist ' + artist + ' not found! ')
-    except KeyError:
-        print('title ' + title + ' artist ' + artist + ' not found! (Key error)')
-    finally:
-        time.sleep(0.2)
+        track_id, track_name = search_track_on_spotify(clear_query_string)
+    except Exception as e:
+        print(clear_query_string + ' not found!  ' + e.__str__())
+    time.sleep(0.2)
 
 with open('spotifyIds.json', 'w', encoding='utf-8') as s:
     s.write(json.dumps(track_list_spotify, indent=2, ensure_ascii=False))
