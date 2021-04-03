@@ -128,42 +128,6 @@ def revoke_user_token():
     config['sp_access_token'] = response['access_token']
 
 
-# sess = requests.session()
-# sess.headers.update({'User-Agent': config.get('user_agent')})
-#
-# page_size = 100
-# total_tracks = sess.get(
-#     "https://api.vk.com/method/audio.get",
-#     params=[('access_token', config.get('vk_token')),
-#             ('v', config.get('version'))]
-# ).json()['response']['count']
-#
-# print(sess.get(
-#     "https://api.vk.com/method/audio.get",
-#     params=[('access_token', config.get('token')),
-#             ('v', config.get('version')),
-#             ('offset', 3900),
-#             ('count', 100)]
-# ).json()['response']['items'])
-#
-# i = 0
-# all_tracks = []
-# while i < total_tracks - page_size:
-#     current_page_tracks = sess.get(
-#         "https://api.vk.com/method/audio.get",
-#         params=[('access_token', config.get('vk_token')),
-#                 ('v', config.get('version')),
-#                 ('count', page_size),
-#                 ('offset', i)]
-#     ).json()['response']['items']
-#     all_tracks += [{'artist': l['artist'], 'title': l['title']} for l in current_page_tracks]
-#     i += page_size
-#     print('Current page tracks: ' + str(i))
-#     time.sleep(1)
-#
-# with open('tracksFromVk.json', 'w', encoding='utf-8') as s:
-#     s.write(json.dumps(all_tracks, indent=2, ensure_ascii=False))
-
 with open('tracksFromVk.json', 'r') as s:
     track_list_vk = json.load(s)
 
