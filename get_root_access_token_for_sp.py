@@ -2,10 +2,9 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 import time
 import json
+import base64
 
-# Username	2yq5sodfqo7nox3yh3xy3xito
-# Email	wotev90990@whyflkj.com
-# Pass:,!2T2:,eg7s@63"
+cypher = 'd290ZXY5MDk5MEB3aHlmbGtqLmNvbV9fLCEyVDI6LGVnN3NANjMi'
 
 
 def get_token():
@@ -14,9 +13,10 @@ def get_token():
     driver = webdriver.Firefox(options=options)
     driver.get("https://accounts.spotify.com/ru/login")
     login_input = driver.find_element_by_id("login-username")
-    login_input.send_keys("wotev90990@whyflkj.com")
+    creds = base64.b64decode(cypher.encode()).decode().split('__')
+    login_input.send_keys(creds[0])
     pass_input = driver.find_element_by_id("login-password")
-    pass_input.send_keys(",!2T2:,eg7s@63\"")
+    pass_input.send_keys(creds[1])
     button = driver.find_element_by_id("login-button")
     button.click()
     time.sleep(0.5)
