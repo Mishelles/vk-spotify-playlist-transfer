@@ -5,48 +5,95 @@ import time
 import yaml
 
 
-with open('creds.yaml', 'r') as c:
-    config = yaml.safe_load(c)
+class VkUtil:
 
-creds_from_vk = get_vk_official_token(config.get('vk_login'), config.get('vk_password'))
-config['vk_token'] = creds_from_vk['token']
-config['vk_user_agent'] = creds_from_vk['user_agent']
+    def __init__(self, page_size=200):
+        self._batch = 0
+        self._offset = 0
+        self._prepare_config()
+        self._page_size = page_size
+        self._session = self._prepare_vk_session()
+        self._total_tracks = self.get_total_tracks()
+        self._last_iteration = False
 
-sess = requests.session()
-sess.headers.update({'User-Agent': config.get('vk_user_agent')})
+    def _prepare_vk_session(self) -> requests.session:
+        creds_from_vk = get_vk_official_token(self._config.get('vk_login'), self._config.get('vk_password'))
+        self._config['vk_token'] = creds_from_vk['token']
+        self._config['vk_user_agent'] = creds_from_vk['user_agent']
+        sess = requests.session()
+        sess.headers.update({'User-Agent': self._config.get('vk_user_agent')})
+        return sess
 
-page_size = 200
-total_tracks = sess.get(
-    "https://api.vk.com/method/audio.get",
-    params=[('access_token', config.get('vk_token')),
-            ('v', config.get('vk_version'))]
-).json()['response']['count']
+    def _prepare_config(self) -> None:
+        with open('creds.yaml', 'r') as c:
+            self._config = yaml.safe_load(c)
 
-i = 0
-all_tracks = []
+    def get_total_tracks(self) -> int:
+        return self._session.get(
+            "https://api.vk.com/method/audio.get",
+            params=[('access_token', self._config.get('vk_token')),
+                    ('v', self._config.get('vk_version'))]
+        ).json()['response']['count']
 
-while i < total_tracks - page_size:
-    current_page_tracks = sess.get(
-        "https://api.vk.com/method/audio.get",
-        params=[('access_token', config.get('vk_token')),
-                ('v', config.get('vk_version')),
-                ('count', page_size),
-                ('offset', i)]
-    ).json()['response']['items']
-    all_tracks += [{'artist': l['artist'], 'title': l['title']} for l in current_page_tracks]
-    i += page_size
-    time.sleep(1)
+    def __iter__(self):
+        return self
 
-mod = total_tracks % page_size
-current_page_tracks = sess.get(
-        "https://api.vk.com/method/audio.get",
-        params=[('access_token', config.get('vk_token')),
-                ('v', config.get('vk_version')),
-                ('count', mod),
-                ('offset', i)]
-    ).json()['response']['items']
-all_tracks += [{'artist': l['artist'], 'title': l['title']} for l in current_page_tracks]
-time.sleep(1)
+    def __next__(self):
+        if self._last_iteration:
+            raise StopIteration
+        if self._offset < self._total_tracks - self._page_size:
+            page_size = self._page_size
+        else:
+            page_size = self._total_tracks % self._page_size
+            self._last_iteration = True
+        current_page_tracks = self._session.get(
+            "https://api.vk.com/method/audio.get",
+            params=[('access_token', self._config.get('vk_token')),
+                    ('v', self._config.get('vk_version')),
+                    ('count', page_size),
+                    ('offset', self._offset)]
+        ).json()['response']['items']
+        self._offset += page_size
+        time.sleep(1)
+        return [{'artist': l['artist'], 'title': l['title']} for l in current_page_tracks]
 
-with open('tracksFromVk.json', 'w', encoding='utf-8') as s:
-    s.write(json.dumps(all_tracks, indent=2, ensure_ascii=False))
+
+
+vk = VkUtil()
+
+counter = 0
+for batch in vk:
+    print(counter)
+    counter += len(batch)
+
+print(counter)
+
+
+# i = 0
+# all_tracks = []
+
+# while i < total_tracks - page_size:
+#     current_page_tracks = sess.get(
+#         "https://api.vk.com/method/audio.get",
+#         params=[('access_token', config.get('vk_token')),
+#                 ('v', config.get('vk_version')),
+#                 ('count', page_size),
+#                 ('offset', i)]
+#     ).json()['response']['items']
+#     all_tracks += [{'artist': l['artist'], 'title': l['title']} for l in current_page_tracks]
+#     i += page_size
+#     time.sleep(1)
+#
+# mod = total_tracks % page_size
+# current_page_tracks = sess.get(
+#     "https://api.vk.com/method/audio.get",
+#     params=[('access_token', config.get('vk_token')),
+#             ('v', config.get('vk_version')),
+#             ('count', mod),
+#             ('offset', i)]
+# ).json()['response']['items']
+# all_tracks += [{'artist': l['artist'], 'title': l['title']} for l in current_page_tracks]
+# time.sleep(1)
+#
+# with open('tracksFromVk.json', 'w', encoding='utf-8') as s:
+#     s.write(json.dumps(all_tracks, indent=2, ensure_ascii=False))
