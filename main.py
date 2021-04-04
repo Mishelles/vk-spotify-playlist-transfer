@@ -1,14 +1,3 @@
-from vkaudiotoken import get_vk_official_token
-import requests
-import json
-import time
-import yaml
-import requests
-import json
-import time
-import yaml
-import re
-from nltk.tokenize import RegexpTokenizer
 import spotify_util as spotify
 import vk_util as vk
 
@@ -23,17 +12,11 @@ import vk_util as vk
         7. Repeat steps 4-6 till we get all tracks.
 '''
 
-vk_util = vk.VkUtil()
+vk_util = vk.VkUtil(10)
+spotify_util = spotify.SpotifyUtil()
 
+playlist_id = spotify_util.create_playlist_in_spotify()
 
-
-# ids_to_insert = []
-# i = 0
-# for t in track_list_spotify:
-#     i += 1
-#     ids_to_insert.append(t['id'])
-#     if i == 10:
-#         i = 0
-#         add_tracks_to_playlist(ids_to_insert, sp_playlist_id)
-#         ids_to_insert = []
-
+for batch in vk_util:
+    tracks = spotify_util.batch_track_search(batch)
+    spotify_util.add_tracks_to_playlist([track['id'] for track in tracks], playlist_id)

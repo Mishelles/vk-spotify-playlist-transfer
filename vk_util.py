@@ -1,6 +1,5 @@
 from vkaudiotoken import get_vk_official_token
 import requests
-import time
 import yaml
 
 
@@ -53,5 +52,4 @@ class VkUtil:
                     ('offset', self._offset)]
         ).json()['response']['items']
         self._offset += page_size
-        time.sleep(1)
         return [{'artist': l['artist'], 'title': l['title']} for l in current_page_tracks]
