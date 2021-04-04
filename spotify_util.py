@@ -31,11 +31,17 @@ class SpotifyUtil:
         for song in track_list:
             title = song['title']
             artist = song['artist']
-            clear_query_string = self.__class__._clean(title, artist)
+            cleaned_title = self.__class__._clean(title)
+            cleaned_artist = self.__class__._clean(artist)
             try:
-                track_id, track_name = self.search_track_on_spotify(clear_query_string)
-            except Exception as e:
-                print(clear_query_string + ' not found!  ' + e.__str__())
+                track_id, track_name = self.search_track_on_spotify(cleaned_title + " " + cleaned_artist)
+            except Exception:
+                try:
+                    track_id, track_name = self.search_track_on_spotify(cleaned_title)
+                except Exception as ex:
+                    print(cleaned_title + " " + cleaned_artist + ' not found!  ' + ex.__str__())
+                else:
+                    track_list_spotify.append({'Track name': track_name, 'id': track_id})
             else:
                 track_list_spotify.append({'Track name': track_name, 'id': track_id})
             time.sleep(0.2)
@@ -114,11 +120,15 @@ class SpotifyUtil:
             return self.add_tracks_to_playlist(tracks, id, level + 1)
 
     @staticmethod
-    def _clean(t, a) -> str:
-        without_brackets = re.sub(r'\([^)]*\)\W', '', t + " " + a)
-        without_feat = re.sub(r'(?i)(\s*)f(?:ea)?t(?:(?:\.?|\s)|uring)(?=\s)', '', without_brackets)
+    def _clean(clean_sting) -> str:
+        clean_sting = re.sub(r'\([^)]*\)\W', '', clean_sting)
+        clean_sting = re.sub(r'\[[^)]*]\W', '', clean_sting)
+        clean_sting = re.sub(r'(?i)(\s*)f(?:ea)?t(?:(?:\.?|\s)|uring)(?=\s).*$', '', clean_sting)
+        clean_sting = re.sub(r'(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d', '', clean_sting)
+        if re.match(r'\s*[^0-9]+\s*', clean_sting):
+            clean_sting = re.sub(r'[0-9]+', '', clean_sting)
         tokenizer = RegexpTokenizer(r'\w+')
-        return " ".join(tokenizer.tokenize(without_feat))
+        return " ".join(tokenizer.tokenize(clean_sting))
 
 
 class SpotifyException(Exception):
