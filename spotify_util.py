@@ -89,9 +89,9 @@ def create_playlist_in_spotify(level=0):
     result = requests.post(
         'https://api.spotify.com/v1/users/{}/playlists'.format(config.get('sp_user_id')),
         json={
-            "name": "Test playlist",
-            "description": "New playlist description",
-            "public": 'false'
+            "name": config.get("sp_playlist_name"),
+            "description": config.get("sp_playlist_description"),
+            "public": config.get("sp_is_playlist_public")
         },
         headers={
             "Authorization": 'Bearer {}'.format(config.get('sp_access_token'))
