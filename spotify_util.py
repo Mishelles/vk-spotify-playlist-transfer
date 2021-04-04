@@ -129,6 +129,8 @@ for song in track_list_vk:
         track_id, track_name = search_track_on_spotify(clear_query_string)
     except Exception as e:
         print(clear_query_string + ' not found!  ' + e.__str__())
+    else:
+        track_list_spotify.append({'Track name': track_name, 'id': track_id})
     time.sleep(0.2)
 
 with open('spotifyIds.json', 'w', encoding='utf-8') as s:
