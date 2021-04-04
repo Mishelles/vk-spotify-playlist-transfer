@@ -23,5 +23,17 @@ import vk_util as vk
         7. Repeat steps 4-6 till we get all tracks.
 '''
 
-vk_session = vk.prepare_vk_session()
+vk_util = vk.VkUtil()
+
+
+
+# ids_to_insert = []
+# i = 0
+# for t in track_list_spotify:
+#     i += 1
+#     ids_to_insert.append(t['id'])
+#     if i == 10:
+#         i = 0
+#         add_tracks_to_playlist(ids_to_insert, sp_playlist_id)
+#         ids_to_insert = []
 
