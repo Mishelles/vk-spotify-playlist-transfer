@@ -28,10 +28,11 @@ class VkUtil:
 
     def get_total_tracks(self) -> int:
         return self._session.get(
-            "https://api.vk.com/method/audio.get",
-            params=[('access_token', self._config.get('vk_token')),
-                    ('v', self._config.get('vk_version'))]
-        ).json()['response']['count']
+            url="https://api.vk.com/method/audio.get",
+            params=[
+                ('access_token', self._config.get('vk_token')),
+                ('v', self._config.get('vk_version'))
+            ]).json()['response']['count']
 
     def __iter__(self):
         return self
@@ -45,11 +46,12 @@ class VkUtil:
             page_size = self._total_tracks % self._page_size
             self._last_iteration = True
         current_page_tracks = self._session.get(
-            "https://api.vk.com/method/audio.get",
-            params=[('access_token', self._config.get('vk_token')),
-                    ('v', self._config.get('vk_version')),
-                    ('count', page_size),
-                    ('offset', self._offset)]
-        ).json()['response']['items']
+            url="https://api.vk.com/method/audio.get",
+            params=[
+                ('access_token', self._config.get('vk_token')),
+                ('v', self._config.get('vk_version')),
+                ('count', page_size),
+                ('offset', self._offset)
+            ]).json()['response']['items']
         self._offset += page_size
         return [{'artist': l['artist'], 'title': l['title']} for l in current_page_tracks]

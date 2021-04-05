@@ -28,3 +28,7 @@ def get_token():
     access_token = json.loads(response.text)['accessToken']
     driver.close()
     return access_token
+
+
+if __name__ == '__main__':
+    print(get_token())

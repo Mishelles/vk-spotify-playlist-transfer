@@ -21,9 +21,14 @@ class SpotifyUtil:
         self._config['sp_root_token'] = get_token()
 
     def _revoke_user_token(self):
-        response = requests.post('https://accounts.spotify.com/api/token',
-                                 data={'refresh_token': self._config.get("sp_refresh_token"), 'grant_type': 'refresh_token'},
-                                 headers={"Authorization": 'Basic {}'.format(self._config.get('sp_basic_auth'))}).json()
+        response = requests.post(url='https://accounts.spotify.com/api/token',
+                                 data={
+                                     'refresh_token': self._config.get("sp_refresh_token"),
+                                     'grant_type': 'refresh_token'
+                                 },
+                                 headers={
+                                     "Authorization": 'Basic {}'.format(self._config.get('sp_basic_auth'))
+                                 }).json()
         self._config['sp_access_token'] = response['access_token']
 
     def batch_track_search(self, track_list) -> list:
@@ -52,7 +57,7 @@ class SpotifyUtil:
         if level > 2:
             raise SpotifyAuthException
         result = requests.post(
-            'https://api.spotify.com/v1/users/{}/playlists'.format(self._config.get('sp_user_id')),
+            url='https://api.spotify.com/v1/users/{}/playlists'.format(self._config.get('sp_user_id')),
             json={
                 "name": self._config.get("sp_playlist_name"),
                 "description": self._config.get("sp_playlist_description"),
@@ -76,7 +81,7 @@ class SpotifyUtil:
         if level > 2:
             raise SpotifyAuthException
         response = requests.get(
-            'https://spclient.wg.spotify.com/searchview/km/v4/search/{}'.format(query),
+            url='https://spclient.wg.spotify.com/searchview/km/v4/search/{}'.format(query),
             params={
                 'catalogue': '',
                 'country': 'RU'
@@ -110,7 +115,7 @@ class SpotifyUtil:
             raise SpotifyAuthException
         tracks_str = ','.join(tracks)
         res = requests.post(
-            'https://api.spotify.com/v1/playlists/{}/tracks?uris={}'.format(id, tracks_str),
+            url='https://api.spotify.com/v1/playlists/{}/tracks?uris={}'.format(id, tracks_str),
             headers={
                 "Authorization": 'Bearer {}'.format(self._config.get('sp_access_token'))
             }
