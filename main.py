@@ -1,4 +1,4 @@
-import spotify_util as spotify
+# import spotify_util as spotify
 import vk_util as vk
 
 '''
@@ -13,10 +13,12 @@ import vk_util as vk
 '''
 
 vk_util = vk.VkUtil(10)
-spotify_util = spotify.SpotifyUtil()
+print(vk_util._access_token)
+# spotify_util = spotify.SpotifyUtil()
 
-playlist_id = spotify_util.create_playlist_in_spotify()
+# playlist_id = spotify_util.create_playlist_in_spotify()
 
 for batch in vk_util:
-    tracks = spotify_util.batch_track_search(batch)
-    spotify_util.add_tracks_to_playlist([track['id'] for track in tracks], playlist_id)
+    print(batch)
+    # tracks = spotify_util.batch_track_search(batch)
+    # spotify_util.add_tracks_to_playlist([track['id'] for track in tracks], playlist_id)
