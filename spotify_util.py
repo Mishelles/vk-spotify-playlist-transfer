@@ -126,12 +126,18 @@ class SpotifyUtil:
 
     @staticmethod
     def _clean(clean_sting) -> str:
-        clean_sting = re.sub(r'([^)]*)\W', '', clean_sting)
-        clean_sting = re.sub(r'\[[^)]*]\W', '', clean_sting)
+        # Remove "()"
+        clean_sting = re.sub(r'\([^)]*\)', '', clean_sting)
+        # Remove "[]"
+        clean_sting = re.sub(r'\[[^)]*\]', '', clean_sting)
+        # Remove "feat."
         clean_sting = re.sub(r'(?i)(\s*)f(?:ea)?t(?:(?:\.?|\s)|uring)(?=\s).*$', '', clean_sting)
+        # Remove date
         clean_sting = re.sub(r'(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d', '', clean_sting)
+        # Remove numbers
         if re.match(r'\s*[^0-9]+\s*', clean_sting):
             clean_sting = re.sub(r'[0-9]+', '', clean_sting)
+        # Remove other garbage
         tokenizer = RegexpTokenizer(r'\w+')
         return " ".join(tokenizer.tokenize(clean_sting))
 
