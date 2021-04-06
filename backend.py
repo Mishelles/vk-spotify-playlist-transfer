@@ -15,7 +15,7 @@ SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize?client_id={}&response
 
 
 @app.get("/spotify-login")
-def spotify_uth():
+def spotify_login():
     return RedirectResponse(url=SPOTIFY_AUTH_URL.format(config['sp_client_id'], SPOTIFY_REDIRECT_URL))
 
 
