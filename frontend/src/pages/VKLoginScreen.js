@@ -1,4 +1,13 @@
-import {FormControl, IconButton, Input, InputAdornment, InputLabel, makeStyles, Typography} from "@material-ui/core";
+import {
+    Button,
+    FormControl,
+    IconButton,
+    Input,
+    InputAdornment,
+    InputLabel,
+    makeStyles,
+    Typography
+} from "@material-ui/core";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import clsx from 'clsx';
@@ -30,7 +39,6 @@ export default function VKLoginScreen() {
 
     const handleChange = (prop) => (event) => {
         setValues({...values, [prop]: event.target.value});
-        console.log(event.target.value);
     };
     const classes = useStyles();
 
@@ -40,6 +48,11 @@ export default function VKLoginScreen() {
 
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
+    };
+
+    const handleButtonOnClick = (event) => {
+        console.log(values.login);
+        console.log(values.password);
     };
 
     return (
@@ -79,6 +92,9 @@ export default function VKLoginScreen() {
                     }
                 />
             </FormControl>
+            <Button variant="contained" color="primary" onClick={handleButtonOnClick}>
+                Login
+            </Button>
         </div>
     )
 }
