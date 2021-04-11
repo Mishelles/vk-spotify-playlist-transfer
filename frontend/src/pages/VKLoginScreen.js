@@ -12,6 +12,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import clsx from 'clsx';
 import React from "react";
+import { useHistory } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -30,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function VKLoginScreen() {
+    let history = useHistory();
 
     const [values, setValues] = React.useState({
         login: '',
@@ -51,8 +53,7 @@ export default function VKLoginScreen() {
     };
 
     const handleButtonOnClick = (event) => {
-        console.log(values.login);
-        console.log(values.password);
+        history.push('/vk-confirm');
     };
 
     return (
