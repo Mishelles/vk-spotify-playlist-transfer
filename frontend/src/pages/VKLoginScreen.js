@@ -13,6 +13,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import clsx from 'clsx';
 import React from "react";
 import { useHistory } from 'react-router-dom'
+import DescriptionComponent from "../components/DescriptionComponent";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -58,9 +59,7 @@ export default function VKLoginScreen() {
 
     return (
         <div>
-            <Typography variant="h1" color="primary">
-                lol
-            </Typography>
+            <DescriptionComponent text="Now you need to login into your VK account" />
             <FormControl className={clsx(classes.margin, classes.withoutLabel, classes.textField)}>
                 <Input
                     id="standard-adornment-weight"

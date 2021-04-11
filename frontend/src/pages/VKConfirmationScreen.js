@@ -2,6 +2,7 @@ import clsx from "clsx";
 import {Button, FormControl, Input, InputAdornment, makeStyles, Typography} from "@material-ui/core";
 import React from "react";
 import { useHistory } from 'react-router-dom'
+import DescriptionComponent from "../components/DescriptionComponent";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -37,9 +38,7 @@ export default function VKConfirmationScreen() {
 
     return (
         <div>
-            <Typography variant="h1" color="primary">
-                lol
-            </Typography>
+            <DescriptionComponent text="SMS with confirmation code has been sent. Please, check your phone and enter the code below" />
             <FormControl className={clsx(classes.margin, classes.withoutLabel, classes.textField)}>
                 <Input
                     id="standard-adornment-weight"
