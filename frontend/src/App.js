@@ -12,9 +12,11 @@ function App() {
     return (
       <Router>
           <Route exact path="/" component={WelcomeScreen}/>
-          <Route exact path="/vk-login" component={VKLoginScreen}/>
-          <Route exact path="/spotify-login" component={SpotifyLoginScreen}/>
-          <Route exact path="/vk-confirm" component={VKConfirmationScreen}/>
+          <Route path="/vk-login" component={VKLoginScreen}/>
+          <Route path="/spotify-login" component={SpotifyLoginScreen}/>
+          <Route path="/vk-confirm" component={VKConfirmationScreen}/>
+          <Route path="/spotify-redirect" component={() => { window.location = 'https://google.com' }}/>
+          <Route path="/spotify-callback" component={() => { console.log("kek") }}/>
       </Router>
     )
 }
