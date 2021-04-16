@@ -3,6 +3,7 @@ import {Button, FormControl, Grid, Input, InputAdornment, makeStyles, Typography
 import React from "react";
 import {Link, useHistory} from 'react-router-dom'
 import DescriptionComponent from "../components/DescriptionComponent";
+import ButtonComponent from "../components/ButtonComponent";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -32,10 +33,6 @@ export default function VKConfirmationScreen() {
         setValues({...values, [prop]: event.target.value});
     };
 
-    const handleButtonOnClick = (event) => {
-        history.push('/');
-    };
-
     return (
         <div className="main">
             <DescriptionComponent text="SMS with confirmation code has been sent. Please, check your phone and enter the code below" />
@@ -51,15 +48,7 @@ export default function VKConfirmationScreen() {
                     }}
                 />
             </FormControl>
-            <Grid container justify="center" alignItems="center" alignContent="center" direction="column">
-                <Grid item xs={6} >
-                    <Link to="/">
-                        <Button variant="contained" color="primary" onClick={handleButtonOnClick}>
-                            LET'S GO
-                        </Button>
-                    </Link>
-                </Grid>
-            </Grid>
+            <ButtonComponent text="CONTINUE" link="/"/>
         </div>
     )
 }

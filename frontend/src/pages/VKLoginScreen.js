@@ -14,6 +14,7 @@ import clsx from 'clsx';
 import React from "react";
 import {Link, useHistory} from 'react-router-dom'
 import DescriptionComponent from "../components/DescriptionComponent";
+import ButtonComponent from "../components/ButtonComponent";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -92,15 +93,7 @@ export default function VKLoginScreen() {
                     }
                 />
             </FormControl>
-            <Grid container justify="center" alignItems="center" alignContent="center" direction="column">
-                <Grid item xs={6} >
-                    <Link to="/vk-confirm">
-                        <Button variant="contained" color="primary" onClick={handleButtonOnClick}>
-                            LET'S GO
-                        </Button>
-                    </Link>
-                </Grid>
-            </Grid>
+            <ButtonComponent text="LOGIN TO VK" link="/vk-confirm"/>
         </div>
     )
 }
