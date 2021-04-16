@@ -17,6 +17,7 @@ import DescriptionComponent from "../components/DescriptionComponent";
 import ButtonComponent from "../components/ButtonComponent";
 import LogosComponent from "../components/LogosComponent";
 import InputComponent from "../components/InputComponent";
+import {withStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -34,6 +35,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const WhiteTextTypography = withStyles({
+    root: {
+        color: "#f2f2f2",
+    }
+})(Typography);
+
 export default function VKLoginScreen() {
     let history = useHistory();
 
@@ -49,7 +56,7 @@ export default function VKLoginScreen() {
     const classes = useStyles();
 
     const handleClickShowPassword = () => {
-        setValues({ ...values, showPassword: !values.showPassword });
+        setValues({...values, showPassword: !values.showPassword});
     };
 
     const handleMouseDownPassword = (event) => {
@@ -63,10 +70,22 @@ export default function VKLoginScreen() {
     return (
         <div className="main">
             <LogosComponent/>
-            <DescriptionComponent text="Now you need to login into your VK account" />
-            <InputComponent text="Email or phone number" />
-            <InputComponent text="Password" />
+            <DescriptionComponent text="Now you need to login into your VK account"/>
+            <InputComponent text="Email or phone number"/>
+            <InputComponent text="Password"/>
             <ButtonComponent text="LOGIN TO VK" link="/vk-confirm"/>
+            <div className="disclaimer">
+                <Grid container justify="center" alignItems="center" direction="column">
+                    <Grid item xs={12}>
+                        <WhiteTextTypography variant="p" align="center">
+                            *Do not worry about your login credentials safety. We need them only to access limiteed VK
+                            music API. After login you’ll receive a security alert from VK about login attempt from
+                            Android device. This is a normal behaviour. If you don’t trust, you can change your password
+                            at any time.
+                        </WhiteTextTypography>
+                    </Grid>
+                </Grid>
+            </div>
         </div>
     )
 }

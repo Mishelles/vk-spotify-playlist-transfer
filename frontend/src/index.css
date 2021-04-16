@@ -34,3 +34,9 @@ a {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.17);
   border-radius: 5px;
 }
+
+.disclaimer {
+  margin-top: 250px;
+  margin-left: 50px;
+  margin-right: 50px;
+}
