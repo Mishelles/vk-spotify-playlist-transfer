@@ -10,9 +10,12 @@ const useStyles = makeStyles({
         color: '#FFF',
         marginTop: '50px',
         "&:hover, &:focus": {
-            background: '#14843e'
+            background: '#22e06b'
         },
         width: '250px',
+        fontSize: 18,
+        fontWeight: 600,
+        backdropFilter: 'blur(2.84419px)',
     },
 });
 
@@ -21,7 +24,7 @@ export default function ButtonComponent(props) {
 
     return (
         <Grid container justify="center" alignItems="center" alignContent="center" direction="column" >
-            <Grid item xs={6}>
+            <Grid item xs={12}>
                 <Link to={props.link}>
                     <Button variant="contained" color="inherit" classes={{
                         root: classes.root,

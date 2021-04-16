@@ -3,8 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 
 const WhiteTextTypography = withStyles({
     root: {
-        color: "#f2f2f2",
-        marginTop: "100px"
+        color: "#f2f2f2"
     }
 })(Typography);
 
@@ -12,7 +11,7 @@ export default function DescriptionComponent(props) {
     return (
         <div className="DescriptionComponent">
             <Grid container justify="center" alignItems="center" direction="column">
-                <Grid item xs={6}>
+                <Grid item xs={10} sm={6}>
                     <WhiteTextTypography variant="h3" align="center">
                         {props.text}
                     </WhiteTextTypography>

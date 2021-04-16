@@ -18,6 +18,7 @@ import ButtonComponent from "../components/ButtonComponent";
 import LogosComponent from "../components/LogosComponent";
 import InputComponent from "../components/InputComponent";
 import {withStyles} from "@material-ui/core/styles";
+import CustomInput from "../components/CustomInput";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -38,6 +39,8 @@ const useStyles = makeStyles((theme) => ({
 const WhiteTextTypography = withStyles({
     root: {
         color: "#f2f2f2",
+        lineHeight: '20px',
+        maxWidth: '70%'
     }
 })(Typography);
 
@@ -71,19 +74,18 @@ export default function VKLoginScreen() {
         <div className="main">
             <LogosComponent/>
             <DescriptionComponent text="Now you need to login into your VK account"/>
-            <InputComponent text="Email or phone number"/>
-            <InputComponent text="Password"/>
+            <CustomInput text="Email or phone number"/>
+            <CustomInput text="Password" type="password"/>
             <ButtonComponent text="LOGIN TO VK" link="/vk-confirm"/>
             <div className="disclaimer">
-                <Grid container justify="center" alignItems="center" direction="column">
-                    <Grid item xs={12}>
-                        <WhiteTextTypography variant="p" align="center">
-                            *Do not worry about your login credentials safety. We need them only to access limiteed VK
-                            music API. After login you’ll receive a security alert from VK about login attempt from
-                            Android device. This is a normal behaviour. If you don’t trust, you can change your password
-                            at any time.
-                        </WhiteTextTypography>
-                    </Grid>
+                <Grid container justify="center" alignItems="center" direction="row">
+                    <WhiteTextTypography variant="p" align="center">
+                        *Do not worry about your login credentials safety. We need them only to access limiteed VK
+                        music API. After login you’ll receive a security alert from VK about login attempt from
+                        Android device. This is a normal behaviour. If you don’t trust, you can change your password
+                        at any time.
+                    </WhiteTextTypography>
+
                 </Grid>
             </div>
         </div>
