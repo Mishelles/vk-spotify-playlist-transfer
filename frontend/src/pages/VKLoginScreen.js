@@ -16,6 +16,7 @@ import {Link, useHistory} from 'react-router-dom'
 import DescriptionComponent from "../components/DescriptionComponent";
 import ButtonComponent from "../components/ButtonComponent";
 import LogosComponent from "../components/LogosComponent";
+import InputComponent from "../components/InputComponent";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -63,38 +64,8 @@ export default function VKLoginScreen() {
         <div className="main">
             <LogosComponent/>
             <DescriptionComponent text="Now you need to login into your VK account" />
-            <FormControl className={clsx(classes.margin, classes.withoutLabel, classes.textField)}>
-                <Input
-                    id="standard-adornment-weight"
-                    value={values.login}
-                    onChange={handleChange('login')}
-                    endAdornment={<InputAdornment position="end">Login</InputAdornment>}
-                    aria-describedby="standard-weight-helper-text"
-                    inputProps={{
-                        'aria-label': 'login',
-                    }}
-                />
-            </FormControl>
-            <FormControl className={clsx(classes.margin, classes.textField)}>
-                <InputLabel htmlFor="standard-adornment-password">Password</InputLabel>
-                <Input
-                    id="standard-adornment-password"
-                    type={values.showPassword ? 'text' : 'password'}
-                    value={values.password}
-                    onChange={handleChange('password')}
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <IconButton
-                                aria-label="toggle password visibility"
-                                onClick={handleClickShowPassword}
-                                onMouseDown={handleMouseDownPassword}
-                            >
-                                {values.showPassword ? <Visibility /> : <VisibilityOff />}
-                            </IconButton>
-                        </InputAdornment>
-                    }
-                />
-            </FormControl>
+            <InputComponent text="Email or phone number" />
+            <InputComponent text="Password" />
             <ButtonComponent text="LOGIN TO VK" link="/vk-confirm"/>
         </div>
     )
