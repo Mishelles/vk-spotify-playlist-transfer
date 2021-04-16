@@ -1,6 +1,6 @@
 import {
     Button,
-    FormControl,
+    FormControl, Grid,
     IconButton,
     Input,
     InputAdornment,
@@ -12,7 +12,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import clsx from 'clsx';
 import React from "react";
-import { useHistory } from 'react-router-dom'
+import {Link, useHistory} from 'react-router-dom'
 import DescriptionComponent from "../components/DescriptionComponent";
 
 const useStyles = makeStyles((theme) => ({
@@ -58,7 +58,7 @@ export default function VKLoginScreen() {
     };
 
     return (
-        <div>
+        <div className="main">
             <DescriptionComponent text="Now you need to login into your VK account" />
             <FormControl className={clsx(classes.margin, classes.withoutLabel, classes.textField)}>
                 <Input
@@ -92,9 +92,15 @@ export default function VKLoginScreen() {
                     }
                 />
             </FormControl>
-            <Button variant="contained" color="primary" onClick={handleButtonOnClick}>
-                Login
-            </Button>
+            <Grid container justify="center" alignItems="center" alignContent="center" direction="column">
+                <Grid item xs={6} >
+                    <Link to="/vk-confirm">
+                        <Button variant="contained" color="primary" onClick={handleButtonOnClick}>
+                            LET'S GO
+                        </Button>
+                    </Link>
+                </Grid>
+            </Grid>
         </div>
     )
 }

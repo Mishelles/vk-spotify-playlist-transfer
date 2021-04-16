@@ -1,7 +1,7 @@
 import clsx from "clsx";
-import {Button, FormControl, Input, InputAdornment, makeStyles, Typography} from "@material-ui/core";
+import {Button, FormControl, Grid, Input, InputAdornment, makeStyles, Typography} from "@material-ui/core";
 import React from "react";
-import { useHistory } from 'react-router-dom'
+import {Link, useHistory} from 'react-router-dom'
 import DescriptionComponent from "../components/DescriptionComponent";
 
 const useStyles = makeStyles((theme) => ({
@@ -37,7 +37,7 @@ export default function VKConfirmationScreen() {
     };
 
     return (
-        <div>
+        <div className="main">
             <DescriptionComponent text="SMS with confirmation code has been sent. Please, check your phone and enter the code below" />
             <FormControl className={clsx(classes.margin, classes.withoutLabel, classes.textField)}>
                 <Input
@@ -51,9 +51,15 @@ export default function VKConfirmationScreen() {
                     }}
                 />
             </FormControl>
-            <Button variant="contained" color="primary" onClick={handleButtonOnClick}>
-                Login
-            </Button>
+            <Grid container justify="center" alignItems="center" alignContent="center" direction="column">
+                <Grid item xs={6} >
+                    <Link to="/">
+                        <Button variant="contained" color="primary" onClick={handleButtonOnClick}>
+                            LET'S GO
+                        </Button>
+                    </Link>
+                </Grid>
+            </Grid>
         </div>
     )
 }

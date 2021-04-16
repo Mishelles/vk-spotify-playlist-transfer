@@ -2,7 +2,6 @@ import {
   BrowserRouter as Router,
   Route
 } from "react-router-dom"
-import './App.css';
 import WelcomeScreen from "./pages/WelcomeScreen";
 import VKLoginScreen from "./pages/VKLoginScreen";
 import SpotifyLoginScreen from "./pages/SpotifyLoginScreen";

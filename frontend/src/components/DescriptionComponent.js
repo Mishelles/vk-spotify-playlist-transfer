@@ -1,13 +1,20 @@
 import {Grid, Typography} from "@material-ui/core";
+import { withStyles } from "@material-ui/core/styles";
+
+const WhiteTextTypography = withStyles({
+    root: {
+        color: "#f2f2f2"
+    }
+})(Typography);
 
 export default function DescriptionComponent(props) {
     return (
-        <div>
+        <div className="DescriptionComponent">
             <Grid container justify="center" alignItems="center" direction="column">
                 <Grid item xs={6}>
-                    <Typography variant="h3" color="primary" align="center">
+                    <WhiteTextTypography variant="h3" align="center">
                         {props.text}
-                    </Typography>
+                    </WhiteTextTypography>
                 </Grid>
             </Grid>
         </div>
