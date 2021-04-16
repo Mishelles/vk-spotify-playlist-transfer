@@ -11,3 +11,12 @@
 .DescriptionComponent {
   color: #FFFF;
 }
+
+.ButtonComponent {
+  background: #1DB954;
+  box-shadow: 0 0 35px 3px rgba(0, 0, 0, 0.29);
+  border-radius: 35px;
+}
+a {
+  text-decoration: none;
+}
