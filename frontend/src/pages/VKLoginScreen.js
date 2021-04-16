@@ -15,6 +15,7 @@ import React from "react";
 import {Link, useHistory} from 'react-router-dom'
 import DescriptionComponent from "../components/DescriptionComponent";
 import ButtonComponent from "../components/ButtonComponent";
+import LogosComponent from "../components/LogosComponent";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -60,6 +61,7 @@ export default function VKLoginScreen() {
 
     return (
         <div className="main">
+            <LogosComponent/>
             <DescriptionComponent text="Now you need to login into your VK account" />
             <FormControl className={clsx(classes.margin, classes.withoutLabel, classes.textField)}>
                 <Input

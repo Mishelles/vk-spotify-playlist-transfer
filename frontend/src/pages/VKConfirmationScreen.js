@@ -4,6 +4,7 @@ import React from "react";
 import {Link, useHistory} from 'react-router-dom'
 import DescriptionComponent from "../components/DescriptionComponent";
 import ButtonComponent from "../components/ButtonComponent";
+import LogosComponent from "../components/LogosComponent";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -35,6 +36,7 @@ export default function VKConfirmationScreen() {
 
     return (
         <div className="main">
+            <LogosComponent/>
             <DescriptionComponent text="SMS with confirmation code has been sent. Please, check your phone and enter the code below" />
             <FormControl className={clsx(classes.margin, classes.withoutLabel, classes.textField)}>
                 <Input

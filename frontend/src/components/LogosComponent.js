@@ -3,7 +3,7 @@ import React from "react";
 
 export default function LogosComponent(props) {
     return (
-        <Grid container justify="center" alignItems="center" alignContent="center" direction="column" >
+        <Grid className="LogosComponent" container justify="center" alignItems="center" alignContent="center" direction="column" >
             <Grid container alignItems="center" alignContent="center" xs={4} direction="row" wrap="nowrap">
                 <Grid item container justify="center">
                     <img src="vk-logo.png" alt="Vk logo" width="100px" className="logo"/>
