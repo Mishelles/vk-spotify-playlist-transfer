@@ -11,7 +11,7 @@ export default function SpotifyLoginScreen() {
         <div className="main">
             <LogosComponent/>
             <DescriptionComponent text="In order to create new playlist and add tracks we need you to login into your Spotify account" />
-            <ButtonComponent text="LOGIN TO SPOTIFY" link="/vk-login"/>
+            <ButtonComponent text="LOGIN TO SPOTIFY" link="/spotify-redirect"/>
         </div>
     )
 }
