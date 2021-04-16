@@ -1,4 +1,5 @@
 creds.yaml
+frontend/node_modules
 /.idea
 tracksFromVk.json
 spotifyIds.json
