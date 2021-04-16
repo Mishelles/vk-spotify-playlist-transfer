@@ -8,7 +8,7 @@ const useStyles = makeStyles({
         boxShadow: '0 0 35px 3px rgba(0, 0, 0, 0.29)',
         borderRadius: '35px',
         color: '#FFF',
-        marginTop: '100px',
+        marginTop: '50px',
         "&:hover, &:focus": {
             background: '#14843e'
         },
