@@ -1,4 +1,5 @@
 creds.yaml
+node_modules
 frontend/node_modules
 /.idea
 tracksFromVk.json
