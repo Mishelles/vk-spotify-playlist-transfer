@@ -1,4 +1,4 @@
-creds.yaml
+backend/creds.yaml
 node_modules
 frontend/node_modules
 /.idea
