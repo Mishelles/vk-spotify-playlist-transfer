@@ -1,4 +1,5 @@
 import os
+import uuid
 
 import yaml
 
@@ -7,7 +8,10 @@ from fastapi import FastAPI, HTTPException
 
 from pydantic import BaseModel
 
+import redis
+
 app = FastAPI()
+redis_client = redis.Redis()
 
 with open('creds.yaml', 'r') as c:
     config = yaml.safe_load(c)
@@ -15,12 +19,37 @@ with open('creds.yaml', 'r') as c:
 SPOTIFY_REDIRECT_URL = os.environ.get('SPOTIFY_REDIRECT_URL', 'http://localhost:3000/spotify-callback')
 
 
-class SpotifyLoginDto(BaseModel):
+class BaseInputDto(BaseModel):
+    session_id: str
+
+
+class SpotifyLoginInputDto(BaseInputDto):
     code: str
 
 
+class VkLoginInputDto(BaseInputDto):
+    login: str
+    password: str
+
+
+class InitSessionResponseDto(BaseModel):
+    session_id: str
+
+
+def generate_session_id():
+    return uuid.uuid4()
+
+
+@app.post("/init-session", status_code=200)
+def init_session() -> InitSessionResponseDto:
+    session_id = generate_session_id()
+    if redis_client.get(session_id):
+        redis_client.delete(session_id)
+    return InitSessionResponseDto(session_id=session_id)
+
+
 @app.post("/login/spotify", status_code=200)
-def login_to_spotify(dto: SpotifyLoginDto):
+def login_to_spotify(dto: SpotifyLoginInputDto):
     response = requests.post(
         url='https://accounts.spotify.com/api/token',
         data={
@@ -32,10 +61,18 @@ def login_to_spotify(dto: SpotifyLoginDto):
             "Authorization": 'Basic {}'.format(config.get('sp_basic_auth'))
         }).json()
     try:
-        config['sp_access_token'] = response['access_token']
-        config['sp_refresh_token'] = response['refresh_token']
+        redis_client.mset({
+            dto.session_id: {
+                'spotify': {
+                    'sp_access_token': response['access_token'],
+                    'sp_refresh_token': response['refresh_token']
+                }
+            }
+        })
     except KeyError:
         raise HTTPException(status_code=400, detail='Invalid code provided')
-    else:
-        with open('creds.yaml', 'w') as file_object:
-            yaml.safe_dump(config, file_object)
+
+
+@app.post("/login/vk", status_code=200)
+def login_to_vk(dto: VkLoginInputDto):
+    pass
