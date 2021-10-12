@@ -10,6 +10,8 @@ import VKConfirmationScreen from "./pages/VKConfirmationScreen";
 import {SPOTIFY_AUTH_URL} from "./config";
 
 function App() {
+    // TODO need final screen or redirection
+
     return (
       <Router>
           <Route exact path="/" component={WelcomeScreen}/>

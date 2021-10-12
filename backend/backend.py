@@ -39,7 +39,7 @@ class InitSessionResponseDto(BaseModel):
 def generate_session_id():
     return uuid.uuid4()
 
-
+# TODO how would it be connected to the UI?
 @app.post("/init-session", status_code=200)
 def init_session() -> InitSessionResponseDto:
     session_id = generate_session_id()

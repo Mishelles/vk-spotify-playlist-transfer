@@ -4,6 +4,8 @@ import time
 import json
 import base64
 
+""" TODO do we need this due to authorization via browser? """
+
 cypher = 'd290ZXY5MDk5MEB3aHlmbGtqLmNvbV9fLCEyVDI6LGVnN3NANjMi'
 
 

@@ -1,6 +1,8 @@
 import spotify_util as spotify
 import vk_util as vk
 
+""" TODO do we need this file? """
+
 vk_util = vk.VkUtil(10)
 spotify_util = spotify.SpotifyUtil()
 
