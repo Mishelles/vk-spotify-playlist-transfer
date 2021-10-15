@@ -8,7 +8,8 @@ export default function RedirectPage(props) {
     let params = queryString.parse(props.location.search);
     const search = useContext(SearchContext)
     if (params.code !== '') {
-        search.code = new URLSearchParams(props.location.search).get("code")
+        search.setCode(new URLSearchParams(props.location.search).get("code"))
+        search.requestTokens(search.code)
         setTimeout(() => {
             history.push('/vk-login')
         }, 2000)
