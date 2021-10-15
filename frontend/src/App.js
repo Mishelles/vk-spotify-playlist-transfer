@@ -26,11 +26,9 @@ function App() {
     }
     // TODO need final screen or redirection
 
-    const requestTokens = (code) => {
-        axios.post(`http://localhost:8000/login/spotify`, {code: code})
-            .then(res => {
-                console.log(res)
-            })
+    const requestTokens = async (code) => {
+        const response = await axiosInstance.post(`http://localhost:8000/login/spotify`, {code: code, session_id: 'kek'})
+        console.log(response);
     }
 
     return (

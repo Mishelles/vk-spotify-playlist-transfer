@@ -5,12 +5,24 @@ import yaml
 
 import requests
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from pydantic import BaseModel
 
 import redis
 
 app = FastAPI()
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 redis_client = redis.Redis()
 
 with open('creds.yaml', 'r') as c:
@@ -50,6 +62,7 @@ def init_session() -> InitSessionResponseDto:
 
 @app.post("/login/spotify", status_code=200)
 def login_to_spotify(dto: SpotifyLoginInputDto):
+    print(dto.code)
     response = requests.post(
         url='https://accounts.spotify.com/api/token',
         data={
