@@ -1,5 +1,6 @@
 import os
 import uuid
+import json
 
 import yaml
 
@@ -76,12 +77,12 @@ def login_to_spotify(dto: SpotifyLoginInputDto):
     print(response)
     try:
         redis_client.mset({
-            dto.session_id: {
+            dto.session_id: json.dumps({
                 'spotify': {
                     'sp_access_token': response['access_token'],
                     'sp_refresh_token': response['refresh_token']
                 }
-            }
+            })
         })
     except KeyError:
         raise HTTPException(status_code=400, detail='Invalid code provided')
