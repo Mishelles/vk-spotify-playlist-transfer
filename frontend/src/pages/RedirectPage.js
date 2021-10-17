@@ -9,11 +9,11 @@ export default function RedirectPage(props) {
     search.setCodeStr(res);
     console.log(search)
     useEffect(() => { // Pass in a callback function!
-            search.requestTokens(search.code)
+            search.requestTokens(res)
                 .then(history.push('/vk-login'));
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [search]);
+        []);
     return (
         <div className="redirect">
             {/*<p>{new URLSearchParams(props.location.search).get("code")}</p>*/}
