@@ -62,7 +62,7 @@ def init_session() -> InitSessionResponseDto:
 
 @app.post("/login/spotify", status_code=200)
 def login_to_spotify(dto: SpotifyLoginInputDto):
-    print(dto.code)
+    print("Code " + dto.code)
     response = requests.post(
         url='https://accounts.spotify.com/api/token',
         data={
@@ -73,6 +73,7 @@ def login_to_spotify(dto: SpotifyLoginInputDto):
         headers={
             "Authorization": 'Basic {}'.format(config.get('sp_basic_auth'))
         }).json()
+    print(response)
     try:
         redis_client.mset({
             dto.session_id: {

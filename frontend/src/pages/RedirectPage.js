@@ -5,15 +5,18 @@ import {useHistory} from 'react-router-dom';
 
 export default function RedirectPage(props) {
     let history = useHistory();
-    let params = queryString.parse(props.location.search);
     const search = useContext(SearchContext)
-    if (params.code !== '') {
-        search.setCode(new URLSearchParams(props.location.search).get("code"))
-        search.requestTokens(search.code)
-        setTimeout(() => {
-            history.push('/vk-login')
-        }, 2000)
-    }
+    const res = new URLSearchParams(props.location.search).get("code");
+    console.log(res)
+    useEffect(() => {
+        search.setCode(res);
+    }, []);
+    console.log(search)
+    useEffect(() => { // Pass in a callback function!
+            search.requestTokens(search.code)
+                .then(history.push('/vk-login'));
+        },
+        []);
     return (
         <div className="redirect">
             {/*<p>{new URLSearchParams(props.location.search).get("code")}</p>*/}
