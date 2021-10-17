@@ -33,8 +33,8 @@ function App() {
 
     return (
         <SearchProvider value={{
-            setCode: setCodeStr,
             code: code,
+            setCodeStr: setCodeStr,
             requestTokens: requestTokens
         }}>
             <Router>

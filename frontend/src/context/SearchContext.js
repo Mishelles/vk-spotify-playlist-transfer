@@ -2,7 +2,7 @@ import React from 'react'
 
 const SearchContext = React.createContext({
     code: '',
-    setCode: (text) => {},
+    setCodeStr: (text) => {},
     requestTokens: (code) => {},
 
 })

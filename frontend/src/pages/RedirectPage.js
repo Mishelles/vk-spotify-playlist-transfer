@@ -6,16 +6,14 @@ export default function RedirectPage(props) {
     let history = useHistory();
     const search = useContext(SearchContext)
     const res = new URLSearchParams(props.location.search).get("code");
-    console.log(res)
-    var code = search.setCode(res);
-    console.log(code)
+    search.setCodeStr(res);
     console.log(search)
     useEffect(() => { // Pass in a callback function!
             search.requestTokens(search.code)
                 .then(history.push('/vk-login'));
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        []);
+        [search]);
     return (
         <div className="redirect">
             {/*<p>{new URLSearchParams(props.location.search).get("code")}</p>*/}
