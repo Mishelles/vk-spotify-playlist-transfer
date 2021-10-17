@@ -1,7 +1,6 @@
 import {FormControl, Grid, makeStyles, TextField} from "@material-ui/core";
 import clsx from "clsx";
 import React from "react";
-import {useHistory} from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -25,7 +24,6 @@ const useStyles = makeStyles((theme) => ({
 export default function InputComponent(props) {
 
     const classes = useStyles();
-    let history = useHistory();
 
     const [values, setValues] = React.useState({
         code: ''

@@ -1,22 +1,13 @@
 import {
-    Button,
-    FormControl, Grid,
-    IconButton,
-    Input,
-    InputAdornment,
-    InputLabel,
+    Grid,
     makeStyles,
     Typography
 } from "@material-ui/core";
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import clsx from 'clsx';
 import React from "react";
-import {Link, useHistory} from 'react-router-dom'
+import {useHistory} from 'react-router-dom'
 import DescriptionComponent from "../components/DescriptionComponent";
 import ButtonComponent from "../components/ButtonComponent";
 import LogosComponent from "../components/LogosComponent";
-import InputComponent from "../components/InputComponent";
 import {withStyles} from "@material-ui/core/styles";
 import CustomInput from "../components/CustomInput";
 

@@ -1,5 +1,3 @@
-import {Button, Container, Grid} from "@material-ui/core";
-import {Link} from "react-router-dom";
 import DescriptionComponent from "../components/DescriptionComponent";
 import React from "react";
 import ButtonComponent from "../components/ButtonComponent";
