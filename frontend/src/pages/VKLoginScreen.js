@@ -37,7 +37,14 @@ const WhiteTextTypography = withStyles({
 })(Typography);
 
 export default function VKLoginScreen() {
-    const search = useContext(SearchContext)
+    const search = useContext(SearchContext);
+    let history = useHistory();
+
+    const handleLoginButtonClick = async () => {
+        console.log('kek')
+        await search.loginToVk(search.vkLogin, search.vkPass);
+        history.push('/vk-confirm');
+    }
 
     return (
         <div className="main">
@@ -45,7 +52,7 @@ export default function VKLoginScreen() {
             <DescriptionComponent text="Now you need to login into your VK account"/>
             <CustomInput onChange={e => search.setLoginStr(e.target.value)} text="Email or phone number" type="text"/>
             <CustomInput onChange={e => search.setPassStr(e.target.value)} text="Password" type="password"/>
-            <ButtonComponent onClick={() => search.loginToVk(search.vkLogin, search.vkPass)} text="LOGIN TO VK" link="/vk-confirm"/>
+            <ButtonComponent onClick={async () => await handleLoginButtonClick()} text="LOGIN TO VK"/>
             <div className="disclaimer">
                 <Grid container justify="center" alignItems="center" direction="row">
                     <WhiteTextTypography variant="p" align="center">

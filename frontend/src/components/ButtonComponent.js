@@ -23,10 +23,10 @@ export default function ButtonComponent(props) {
     const classes = useStyles();
 
     return (
-        <Grid container justify="center" alignItems="center" alignContent="center" direction="column" >
+        <Grid container onClick={(event) => props.onClick(event)} justify="center" alignItems="center" alignContent="center" direction="column" >
             <Grid item xs={12}>
                 <Link to={props.link}>
-                    <Button variant="contained" color="inherit" classes={{
+                    <Button variant="contained" color="inherit"  classes={{
                         root: classes.root,
                     }}>
                         {props.text}
