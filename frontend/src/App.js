@@ -21,9 +21,19 @@ const axiosInstance = axios.create({
 
 function App() {
     const [code, setCode] = useState('')
+    const [vkLogin, setLogin] = useState('')
+    const [vkPass, setPass] = useState('')
+
     const setCodeStr = (text) => {
         setCode(text)
     }
+    const setLoginStr = (text) => {
+        setLogin(text)
+    }
+    const setPassStr = (text) => {
+        setPass(text)
+    }
+
     // TODO need final screen or redirection
 
     const requestTokens = async (code) => {
@@ -31,11 +41,22 @@ function App() {
         console.log(response);
     }
 
+    const loginToVk = async (vkLogin, vkPass) => {
+        console.log(vkLogin, vkPass)
+        const response = await axiosInstance.post(`http://localhost:8000/login/vk`, {vkLogin: vkLogin, vkPass: vkPass, session_id: 'kek'})
+        console.log(response);
+    }
+
     return (
         <SearchProvider value={{
             code: code,
+            vkLogin: vkLogin,
+            vkPass: vkPass,
+            setLoginStr: setLoginStr,
+            setPassStr: setPassStr,
             setCodeStr: setCodeStr,
-            requestTokens: requestTokens
+            requestTokens: requestTokens,
+            loginToVk: loginToVk
         }}>
             <Router>
                 <Route exact path="/" component={WelcomeScreen}/>

@@ -31,19 +31,18 @@ with open('creds.yaml', 'r') as c:
 
 SPOTIFY_REDIRECT_URL = os.environ.get('SPOTIFY_REDIRECT_URL', 'http://localhost:3000/spotify-callback')
 
-
 class BaseInputDto(BaseModel):
     session_id: str
 
+class VkSessionDto(BaseModel):
+    session_id: str
 
 class SpotifyLoginInputDto(BaseInputDto):
     code: str
 
-
 class VkLoginInputDto(BaseInputDto):
-    login: str
-    password: str
-
+    vkLogin: str
+    vkPass: str
 
 class InitSessionResponseDto(BaseModel):
     session_id: str
@@ -74,7 +73,6 @@ def login_to_spotify(dto: SpotifyLoginInputDto):
         headers={
             "Authorization": 'Basic {}'.format(config.get('sp_basic_auth'))
         }).json()
-    print(response)
     try:
         redis_client.mset({
             dto.session_id: json.dumps({
@@ -89,5 +87,7 @@ def login_to_spotify(dto: SpotifyLoginInputDto):
 
 
 @app.post("/login/vk", status_code=200)
-def login_to_vk(dto: VkLoginInputDto):
+def login_to_vk(dto: VkLoginInputDto) -> VkSessionDto:
+    print("Login: " + dto.vkLogin + ", pass: " + dto.vkPass)
+
     pass

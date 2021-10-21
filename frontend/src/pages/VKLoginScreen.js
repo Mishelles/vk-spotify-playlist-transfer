@@ -3,13 +3,14 @@ import {
     makeStyles,
     Typography
 } from "@material-ui/core";
-import React from "react";
+import React, {useContext} from "react";
 import {useHistory} from 'react-router-dom'
 import DescriptionComponent from "../components/DescriptionComponent";
 import ButtonComponent from "../components/ButtonComponent";
 import LogosComponent from "../components/LogosComponent";
 import {withStyles} from "@material-ui/core/styles";
 import CustomInput from "../components/CustomInput";
+import SearchContext from "../context/SearchContext";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -36,38 +37,15 @@ const WhiteTextTypography = withStyles({
 })(Typography);
 
 export default function VKLoginScreen() {
-    let history = useHistory();
-
-    const [values, setValues] = React.useState({
-        login: '',
-        password: '',
-        showPassword: false,
-    });
-
-    const handleChange = (prop) => (event) => {
-        setValues({...values, [prop]: event.target.value});
-    };
-    const classes = useStyles();
-
-    const handleClickShowPassword = () => {
-        setValues({...values, showPassword: !values.showPassword});
-    };
-
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
-    };
-
-    const handleButtonOnClick = (event) => {
-        history.push('/vk-confirm');
-    };
+    const search = useContext(SearchContext)
 
     return (
         <div className="main">
             <LogosComponent/>
             <DescriptionComponent text="Now you need to login into your VK account"/>
-            <CustomInput text="Email or phone number"/>
-            <CustomInput text="Password" type="password"/>
-            <ButtonComponent text="LOGIN TO VK" link="/vk-confirm"/>
+            <CustomInput onChange={e => search.setLoginStr(e.target.value)} text="Email or phone number" type="text"/>
+            <CustomInput onChange={e => search.setPassStr(e.target.value)} text="Password" type="password"/>
+            <ButtonComponent onClick={() => search.loginToVk(search.vkLogin, search.vkPass)} text="LOGIN TO VK" link="/vk-confirm"/>
             <div className="disclaimer">
                 <Grid container justify="center" alignItems="center" direction="row">
                     <WhiteTextTypography variant="p" align="center">
