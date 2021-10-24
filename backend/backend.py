@@ -39,6 +39,7 @@ VK_API_DEFAULT_VERSION = '5.95'
 sp_code = ''
 sp_access_token = ''
 sp_refresh_token = ''
+sp_playlist_id =''
 
 vk_session = None
 vk_access_token = ''
@@ -115,7 +116,12 @@ def init_process():
     vk_total_tracks = get_total_tracks()
     print("VK total tracks: ")
     print(vk_total_tracks)
-
+    global sp_playlist_id
+    sp_playlist_id = create_playlist_in_spotify()
+    print("SP playlist id: " + sp_playlist_id)
+#     for batch in vk_total_tracks:
+#         tracks = spotify_util.batch_track_search(batch)
+#         spotify_util.add_tracks_to_playlist([track['id'] for track in tracks], playlist_id)
 
 def get_total_tracks() -> int:
     return vk_session.get(
@@ -123,7 +129,9 @@ def get_total_tracks() -> int:
         params=[
             ('access_token', vk_access_token),
             ('v', config.get('vk_version', VK_API_DEFAULT_VERSION))
-        ]).json()['response']['count']
+        ]
+    ).json()['response']['count']
+
 
 def revoke_user_token(self):
     response = requests.post(
@@ -138,6 +146,7 @@ def revoke_user_token(self):
     ).json()
     global sp_access_token
     sp_access_token = response['access_token']
+
 
 def create_playlist_in_spotify(level=0) -> str:
     if level > 2:
