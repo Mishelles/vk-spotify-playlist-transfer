@@ -37,13 +37,14 @@ function App() {
     // TODO need final screen or redirection
 
     const requestTokens = async (code) => {
-        const response = await axiosInstance.post(`http://localhost:8000/login/spotify`, {code: code, session_id: 'kek'})
+        console.log(code)
+        const response = await axiosInstance.post(`http://localhost:8000/login/spotify`, {code: code})
         console.log(response);
     }
 
     const loginToVk = async (vkLogin, vkPass) => {
         console.log(vkLogin, vkPass)
-        const response = await axiosInstance.post(`http://localhost:8000/login/vk`, {vkLogin: vkLogin, vkPass: vkPass, session_id: 'kek'})
+        const response = await axiosInstance.post(`http://localhost:8000/login/vk`, {vkLogin: vkLogin, vkPass: vkPass})
         console.log(response);
     }
 
