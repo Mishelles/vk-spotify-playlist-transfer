@@ -4,6 +4,7 @@ import {
 } from "react-router-dom"
 import WelcomeScreen from "./pages/WelcomeScreen";
 import VKLoginScreen from "./pages/VKLoginScreen";
+import ProgressScreen from "./pages/ProgressScreen";
 import SpotifyLoginScreen from "./pages/SpotifyLoginScreen";
 import RedirectPage from "./pages/RedirectPage";
 import VKConfirmationScreen from "./pages/VKConfirmationScreen";
@@ -37,13 +38,11 @@ function App() {
     // TODO need final screen or redirection
 
     const requestTokens = async (code) => {
-        console.log(code)
         const response = await axiosInstance.post(`http://localhost:8000/login/spotify`, {code: code})
         console.log(response);
     }
 
     const loginToVk = async (vkLogin, vkPass) => {
-        console.log(vkLogin, vkPass)
         const response = await axiosInstance.post(`http://localhost:8000/login/vk`, {vkLogin: vkLogin, vkPass: vkPass})
         console.log(response);
     }
@@ -63,7 +62,8 @@ function App() {
                 <Route exact path="/" component={WelcomeScreen}/>
                 <Route path="/vk-login" component={VKLoginScreen}/>
                 <Route path="/spotify-login" component={SpotifyLoginScreen}/>
-                <Route path="/vk-confirm" component={VKConfirmationScreen}/>
+                <Route path="/progress" component={ProgressScreen}/>
+                {/*<Route path="/vk-confirm" component={VKConfirmationScreen}/>*/}
                 <Route path="/spotify-redirect" component={() => {
                     window.location = SPOTIFY_AUTH_URL
                 }}/>

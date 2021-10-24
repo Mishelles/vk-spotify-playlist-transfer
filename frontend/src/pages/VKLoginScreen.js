@@ -43,7 +43,7 @@ export default function VKLoginScreen() {
     const handleLoginButtonClick = async () => {
         console.log('kek')
         await search.loginToVk(search.vkLogin, search.vkPass);
-        history.push('/vk-confirm');
+        history.push('/progress');
     }
 
     return (
