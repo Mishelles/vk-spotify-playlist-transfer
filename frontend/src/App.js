@@ -46,6 +46,10 @@ function App() {
         const response = await axiosInstance.post(`http://localhost:8000/login/vk`, {vkLogin: vkLogin, vkPass: vkPass})
         console.log(response);
     }
+    const initProcess = async () => {
+        const response = await axiosInstance.post(`http://localhost:8000/init-transfer`)
+        console.log(response);
+    }
 
     return (
         <SearchProvider value={{
@@ -56,7 +60,8 @@ function App() {
             setPassStr: setPassStr,
             setCodeStr: setCodeStr,
             requestTokens: requestTokens,
-            loginToVk: loginToVk
+            loginToVk: loginToVk,
+            initProcess: initProcess
         }}>
             <Router>
                 <Route exact path="/" component={WelcomeScreen}/>

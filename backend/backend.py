@@ -34,11 +34,13 @@ with open('creds.yaml', 'r') as c:
     config = yaml.safe_load(c)
 
 SPOTIFY_REDIRECT_URL = os.environ.get('SPOTIFY_REDIRECT_URL', 'http://localhost:3000/spotify-callback')
+VK_API_DEFAULT_VERSION = '5.95'
 
+sp_code = ''
 sp_access_token = ''
 sp_refresh_token = ''
 
-vk_session = ''
+vk_session = None
 vk_access_token = ''
 
 class SpotifyLoginInputDto(BaseModel):
@@ -54,6 +56,8 @@ def generate_session_id():
 @app.post("/login/spotify", status_code=200)
 def login_to_spotify(dto: SpotifyLoginInputDto):
     print("Code " + dto.code)
+    global sp_code
+    sp_code = dto.code
     response = requests.post(
         url='https://accounts.spotify.com/api/token',
         data={
@@ -103,3 +107,73 @@ def login_to_vk(dto: VkLoginInputDto):
         vk_access_token = token
     except KeyError:
         raise HTTPException(status_code=400, detail='Invalid code provided')
+
+
+@app.post("/init-transfer", status_code=200)
+def init_process():
+    print("Process has started")
+    vk_total_tracks = get_total_tracks()
+    print("VK total tracks: ")
+    print(vk_total_tracks)
+
+
+def get_total_tracks() -> int:
+    return vk_session.get(
+        url="https://api.vk.com/method/audio.get",
+        params=[
+            ('access_token', vk_access_token),
+            ('v', config.get('vk_version', VK_API_DEFAULT_VERSION))
+        ]).json()['response']['count']
+
+def revoke_user_token(self):
+    response = requests.post(
+        url='https://accounts.spotify.com/api/token',
+        data={
+            'refresh_token': sp_refresh_token,
+            'grant_type': 'refresh_token'
+        },
+        headers={
+            "Authorization": 'Basic {}'.format(sp_code)
+        }
+    ).json()
+    global sp_access_token
+    sp_access_token = response['access_token']
+
+def create_playlist_in_spotify(level=0) -> str:
+    if level > 2:
+        raise SpotifyAuthException
+    result = requests.post(
+        url='https://api.spotify.com/v1/users/{}/playlists'.format(config.get('sp_user_id')),
+        json={
+            "name": config.get("sp_playlist_name"),
+            "description": config.get("sp_playlist_description"),
+            "public": config.get("sp_is_playlist_public")
+        },
+        headers={
+            "Authorization": 'Bearer {}'.format(sp_access_token)
+        }
+    )
+    if result.status_code == 401:
+        revoke_user_token()
+        return create_playlist_in_spotify(level + 1)
+    try:
+        playlist_id = result.json()['id']
+    except Exception:
+        raise SpotifySearchException
+    return playlist_id
+
+
+
+
+class SpotifyException(Exception):
+    def __str__(self):
+        return self.__class__.__name__
+
+
+class SpotifySearchException(SpotifyException):
+    pass
+
+
+class SpotifyAuthException(SpotifyException):
+    pass
+

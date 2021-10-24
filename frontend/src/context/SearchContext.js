@@ -9,6 +9,7 @@ const SearchContext = React.createContext({
     setPassStr: (text) => {},
     requestTokens: (code) => {},
     loginToVk: (vkLogin, vkPass) => {},
+    initProcess: () => {}
 })
 
 export const SearchProvider = SearchContext.Provider
