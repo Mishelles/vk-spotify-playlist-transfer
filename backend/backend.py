@@ -10,6 +10,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from pydantic import BaseModel
 
+from vkaudiotoken import (
+    TokenReceiverOfficial,
+    CommonParams,
+    TokenException,
+    TwoFAHelper,
+    supported_clients
+)
+
 import redis
 
 app = FastAPI()
@@ -32,9 +40,6 @@ with open('creds.yaml', 'r') as c:
 SPOTIFY_REDIRECT_URL = os.environ.get('SPOTIFY_REDIRECT_URL', 'http://localhost:3000/spotify-callback')
 
 class BaseInputDto(BaseModel):
-    session_id: str
-
-class VkSessionDto(BaseModel):
     session_id: str
 
 class SpotifyLoginInputDto(BaseInputDto):
@@ -87,7 +92,37 @@ def login_to_spotify(dto: SpotifyLoginInputDto):
 
 
 @app.post("/login/vk", status_code=200)
-def login_to_vk(dto: VkLoginInputDto) -> VkSessionDto:
+def login_to_vk(dto: VkLoginInputDto) -> VkLoginInputDto:
     print("Login: " + dto.vkLogin + ", pass: " + dto.vkPass)
-
-    pass
+    params = CommonParams(supported_clients.VK_OFFICIAL.user_agent)
+    receiver = TokenReceiverOfficial(dto.vkLogin, dto.vkPass, params)
+    try:
+        credentials_from_vk = receiver.get_token()
+    except TokenException as err:
+        if err.code == TokenException.TWOFA_REQ and 'validation_sid' in err.extra:
+           TwoFAHelper(params).validate_phone(err.extra['validation_sid'])
+           print('2FA auth enabled. SMS should be sent')
+           """ auth_code = input('Please, wait for SMS and insert your authorization code below: \n')
+           receiver = TokenReceiverOfficial(self._config.get('vk_login'), self._config.get('vk_password'), params, auth_code)
+           try:
+               credentials_from_vk = receiver.get_token()
+           except Exception as e:
+               raise """
+        else:
+            raise
+    access_token = credentials_from_vk['access_token']
+    print("VK token: " + access_token)
+    session = requests.session()
+    session.headers.update({'User-Agent': supported_clients.VK_OFFICIAL.user_agent})
+    try:
+        redis_client.mset({
+            dto.session_id: json.dumps({
+                'vk': {
+                    'vk_session': json.dumps(dict(session)),
+                    'access_token': access_token
+                }
+            })
+        })
+    except KeyError:
+        raise HTTPException(status_code=400, detail='Invalid code provided')
+    return VkLoginInputDto
