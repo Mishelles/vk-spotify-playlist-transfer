@@ -44,6 +44,11 @@ sp_playlist_id =''
 vk_session = None
 vk_access_token = ''
 
+last_iteration = False
+batch = 0
+offset = 0
+page_size=200
+
 class SpotifyLoginInputDto(BaseModel):
     code: str
 
@@ -119,7 +124,8 @@ def init_process():
     global sp_playlist_id
     sp_playlist_id = create_playlist_in_spotify()
     print("SP playlist id: " + sp_playlist_id)
-#     for batch in vk_total_tracks:
+    for batch in self:
+        print("yee")
 #         tracks = spotify_util.batch_track_search(batch)
 #         spotify_util.add_tracks_to_playlist([track['id'] for track in tracks], playlist_id)
 
@@ -172,6 +178,29 @@ def create_playlist_in_spotify(level=0) -> str:
     return playlist_id
 
 
+def __iter__(self):
+        return self
+
+
+def __next__(self):
+    if last_iteration:
+        raise StopIteration
+    if offset < total_tracks - page_size:
+        page_size = page_size
+    else:
+        page_size = total_tracks % page_size
+        last_iteration = True
+    current_page_tracks = vk_session.get(
+        url="https://api.vk.com/method/audio.get",
+        params=[
+            ('access_token', vk_access_token),
+            ('v', config.get('vk_version', VK_API_DEFAULT_VERSION)),
+            ('count', page_size),
+            ('offset', offset)
+        ])
+    current_page_tracks = current_page_tracks.json()['response']['items']
+    offset += page_size
+    return [{'artist': l['artist'], 'title': l['title']} for l in current_page_tracks]
 
 
 class SpotifyException(Exception):
