@@ -3,10 +3,13 @@ import uuid
 import json
 
 import yaml
+import re
+from nltk.tokenize import RegexpTokenizer
 
 import requests
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from get_root_access_token_for_sp import get_token
 
 from pydantic import BaseModel
 
@@ -43,6 +46,7 @@ sp_playlist_id =''
 
 vk_session = None
 vk_access_token = ''
+vk_total_tracks = 0
 
 last_iteration = False
 batch = 0
@@ -54,10 +58,11 @@ class SpotifyLoginInputDto(BaseModel):
 
 class VkLoginInputDto(BaseModel):
     vkLogin: str
-    vkPass: str
+    vkPass: strt
 
-def generate_session_id():
-    return uuid.uuid4()
+class BatchSizeDto(BaseModel):
+    size: str
+
 
 @app.post("/login/spotify", status_code=200)
 def login_to_spotify(dto: SpotifyLoginInputDto):
@@ -118,16 +123,23 @@ def login_to_vk(dto: VkLoginInputDto):
 @app.post("/init-transfer", status_code=200)
 def init_process():
     print("Process has started")
+    global vk_total_tracks
     vk_total_tracks = get_total_tracks()
     print("VK total tracks: ")
     print(vk_total_tracks)
     global sp_playlist_id
     sp_playlist_id = create_playlist_in_spotify()
     print("SP playlist id: " + sp_playlist_id)
-    for batch in self:
-        print("yee")
-#         tracks = spotify_util.batch_track_search(batch)
-#         spotify_util.add_tracks_to_playlist([track['id'] for track in tracks], playlist_id)
+
+
+@app.get('/get-batch', status_code=200)
+def process_batch(dto: BatchSizeDto):
+    print("yee " + dto.size)
+    batch = getTracksFromVK(dto.size)
+    print(batch)
+    tracks = batch_track_search(batch)
+    add_tracks_to_playlist([track['id'] for track in tracks], sp_playlist_id)
+
 
 def get_total_tracks() -> int:
     return vk_session.get(
@@ -139,7 +151,11 @@ def get_total_tracks() -> int:
     ).json()['response']['count']
 
 
-def revoke_user_token(self):
+def _revoke_root_token():
+    config['sp_root_token'] = get_token()
+
+
+def revoke_user_token():
     response = requests.post(
         url='https://accounts.spotify.com/api/token',
         data={
@@ -156,7 +172,7 @@ def revoke_user_token(self):
 
 def create_playlist_in_spotify(level=0) -> str:
     if level > 2:
-        raise SpotifyAuthException
+        raise Exception
     result = requests.post(
         url='https://api.spotify.com/v1/users/{}/playlists'.format(config.get('sp_user_id')),
         json={
@@ -174,22 +190,11 @@ def create_playlist_in_spotify(level=0) -> str:
     try:
         playlist_id = result.json()['id']
     except Exception:
-        raise SpotifySearchException
+        raise Exception
     return playlist_id
 
 
-def __iter__(self):
-        return self
-
-
-def __next__(self):
-    if last_iteration:
-        raise StopIteration
-    if offset < total_tracks - page_size:
-        page_size = page_size
-    else:
-        page_size = total_tracks % page_size
-        last_iteration = True
+def getTracksFromVK(offset):
     current_page_tracks = vk_session.get(
         url="https://api.vk.com/method/audio.get",
         params=[
@@ -203,15 +208,91 @@ def __next__(self):
     return [{'artist': l['artist'], 'title': l['title']} for l in current_page_tracks]
 
 
-class SpotifyException(Exception):
-    def __str__(self):
-        return self.__class__.__name__
+def batch_track_search(track_list) -> list:
+    track_list_spotify = []
+    for song in track_list:
+        title = song['title']
+        artist = song['artist']
+        cleaned_title = clean(title)
+        cleaned_artist = clean(artist)
+        try:
+            track_id, track_name = search_track_on_spotify(cleaned_title + " " + cleaned_artist)
+        except Exception:
+            try:
+                track_id, track_name = search_track_on_spotify(cleaned_title)
+            except Exception as ex:
+                print(cleaned_title + " " + cleaned_artist + ' not found!  ' + ex.__str__())
+            else:
+                track_list_spotify.append({'Track name': track_name, 'id': track_id})
+        else:
+            track_list_spotify.append({'Track name': track_name, 'id': track_id})
+        time.sleep(0.2)
+
+    return track_list_spotify
 
 
-class SpotifySearchException(SpotifyException):
-    pass
+def search_track_on_spotify(query, level=0) -> (str, str):
+    if level > 2:
+        raise SpotifyAuthException
+    response = requests.get(
+        url='https://spclient.wg.spotify.com/searchview/km/v4/search/{}'.format(query),
+        params={
+            'catalogue': '',
+            'country': 'RU'
+        },
+        headers={
+            'Authorization': "Bearer {}".format(self._config.get('sp_root_token')),
+            'Host': "spclient.wg.spotify.com"
+        }
+    )
+    if response.status_code == 401:
+        revoke_root_token()
+        return search_track_on_spotify(query, level + 1)
+    elif response.status_code == 404:
+        raise Exception
+    else:
+        try:
+            results = response.json()
+        except Exception:
+            raise Exception
+
+        try:
+            track_id = results['results']['tracks']['hits'][0]['uri']
+            track_returned_name = results['results']['tracks']['hits'][0]['name']
+        except Exception:
+            raise Exception
+
+        return track_id, track_returned_name
 
 
-class SpotifyAuthException(SpotifyException):
-    pass
+def add_tracks_to_playlist(tracks, id, level=0) -> None:
+    if level > 2:
+        raise Exception
+    tracks_str = ','.join(tracks)
+    res = requests.post(
+        url='https://api.spotify.com/v1/playlists/{}/tracks?uris={}'.format(id, tracks_str),
+        headers={
+            "Authorization": 'Bearer {}'.format(self._config.get('sp_access_token'))
+        }
+    )
+    if res.status_code == 401:
+        revoke_user_token()
+        return add_tracks_to_playlist(tracks, id, level + 1)
 
+
+@staticmethod
+def clean(clean_sting) -> str:
+    # Remove "()"
+    clean_sting = re.sub(r'\([^)]*\)', '', clean_sting)
+    # Remove "[]"
+    clean_sting = re.sub(r'\[[^)]*\]', '', clean_sting)
+    # Remove "feat."
+    clean_sting = re.sub(r'(?i)(\s*)f(?:ea)?t(?:(?:\.?|\s)|uring)(?=\s).*$', '', clean_sting)
+    # Remove date
+    clean_sting = re.sub(r'(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d', '', clean_sting)
+    # Remove numbers
+    if re.match(r'\s*[^0-9]+\s*', clean_sting):
+        clean_sting = re.sub(r'[0-9]+', '', clean_sting)
+    # Remove other garbage
+    tokenizer = RegexpTokenizer(r'\w+')
+    return " ".join(tokenizer.tokenize(clean_sting))
